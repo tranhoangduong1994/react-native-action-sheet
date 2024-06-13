@@ -8,16 +8,21 @@ export default function connectActionSheet<OwnProps = any>(
   WrappedComponent: React.ComponentType<OwnProps & ActionSheetProps>
 ): React.FunctionComponent<OwnProps> {
   const ConnectedActionSheet = (props: OwnProps) => {
+    const { forwardedRef, ...rest } = props;
     return (
       <Consumer>
         {({ showActionSheetWithOptions }) => {
           return (
-            <WrappedComponent {...props} showActionSheetWithOptions={showActionSheetWithOptions} />
+            <WrappedComponent ref={forwardedRef} {...rest} showActionSheetWithOptions={showActionSheetWithOptions} />
           );
         }}
       </Consumer>
     );
   };
 
-  return hoistNonReactStatic(ConnectedActionSheet, WrappedComponent);
+  const ForwardedComponent = React.forwardRef((props, ref) => {
+    return <ConnectedActionSheet {...props} forwardedRef={ref} />;
+  })
+
+  return hoistNonReactStatic(ForwardedComponent, WrappedComponent);
 }
